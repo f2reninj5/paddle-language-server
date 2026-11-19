@@ -17,7 +17,8 @@ next:
     PC <- PC + 1
 
 
-instruction ADD "ADD {1*address:source}" "1{1*address:source}"
+instruction ADD "ADD {1*address:source}"
+decode ADD "1{1*address:source}"
 execute ADD:
     ACC <- ACC + RAM[source]
     next
