@@ -17,7 +17,7 @@ export class Cursor {
 		return this.position >= this.source.length;
 	}
 
-	peek(n: number): string {
+	slice(n: number): string {
 		return this.source.slice(this.position, this.position + n);
 	}
 
