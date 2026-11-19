@@ -5,8 +5,12 @@ export class Cursor {
 
 	constructor(private readonly source: string) {}
 
-	get current(): string | undefined {
-		return this.source[this.position];
+	get current(): string {
+		if (this.isAtEnd) {
+			throw new Error("Unexpected end of source");
+		}
+
+		return this.source[this.position]!;
 	}
 
 	get isAtEnd(): boolean {
