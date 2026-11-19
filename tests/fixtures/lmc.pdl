@@ -1,0 +1,70 @@
+base 10
+
+unit address 2
+unit word 3
+
+memory RAM 100*word
+
+device INPUT 1*word
+device OUTPUT 1*word
+
+register PC 1*word
+register ACC 1*word
+
+fetch RAM[PC]
+
+next:
+    PC <- PC + 1
+
+
+instruction ADD "ADD {1*address:source}" "1{1*address:source}"
+execute ADD:
+    ACC <- ACC + RAM[source]
+    next
+
+instruction SUB "SUB {1*address:source}" "2{1*address:source}"
+execute SUB:
+    ACC <- ACC - RAM[source]
+    next
+
+instruction STA "STA {1*address:destination}" "3{1*address:destination}"
+execute STA:
+    RAM[destination] <- ACC
+    next
+
+instruction LDA "LDA {1*address:source}" "5{1*address:source}"
+execute LDA:
+    ACC <- RAM[source]
+    next
+
+instruction BRA "BRA {1*address:destination}" "6{1*address:destination}"
+execute BRA:
+    PC <- destination
+
+instruction BRZ "BRZ {1*address:destination}" "7{1*address:destination}"
+execute BRZ:
+    if ACC == 0:
+        PC <- destination
+    else:
+        next
+
+instruction BRP "BRP {1*address:destination}" "8{1*address:destination}"
+execute BRP:
+    if ACC >= 0:
+        PC <- destination
+    else:
+        next
+
+instruction INP "INP" "901"
+execute INP:
+    INPUT <- ACC
+    next
+
+instruction OUT "OUT" "902"
+execute OUT:
+    OUTPUT <- ACC
+    next
+
+instruction HLT "HLT" "000"
+execute HLT:
+    halt
