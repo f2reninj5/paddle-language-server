@@ -13,7 +13,7 @@ function isKeywordChar(char: string): boolean {
 	return /[a-z]/.test(char);
 }
 
-export function tokenize(source: string): Token[] {
+export function tokenise(source: string): Token[] {
 	const tokens: Token[] = [];
 	const cursor = new Cursor(source);
 
