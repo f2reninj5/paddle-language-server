@@ -56,6 +56,9 @@ export function tokenise(source: string): Token[] {
 					column: startColumn,
 				});
 			}
+
+			cursor.advance(length);
+			continue;
 		}
 
 	return tokens;
