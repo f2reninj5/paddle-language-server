@@ -22,6 +22,10 @@ export class Cursor {
 	}
 
 	slice(n: number): string {
+		if (this.position + n > this.source.length) {
+			throw new Error("Unexpected end of source");
+		}
+
 		return this.source.slice(this.position, this.position + n);
 	}
 
