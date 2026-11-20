@@ -39,9 +39,9 @@ export class Cursor {
 		return this.source[index];
 	}
 
-	advance(): void {
-		this.position++;
-		this.column++;
+	advance(n: number = 1): void {
+		this.position += n;
+		this.column += n;
 	}
 
 	advanceLine(): void {
