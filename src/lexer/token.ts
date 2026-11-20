@@ -12,10 +12,8 @@ export enum TokenType {
 	Halt = "Halt",
 
 	// literals
-	UnitIdentifier = "UnitIdentifier",
+	Identifier = "Identifier",
 	ComponentIdentifier = "ComponentIdentifier",
-	FunctionIdentifier = "FunctionIdentifier",
-	ArgumentIdentifier = "ArgumentIdentifier",
 	String = "String",
 	Number = "Number",
 
