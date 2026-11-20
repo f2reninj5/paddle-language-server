@@ -54,3 +54,16 @@ export interface Token {
 	line: number;
 	column: number;
 }
+
+export const keywords = new Map<string, TokenType>([
+	["base", TokenType.Base],
+	["unit", TokenType.Unit],
+	["memory", TokenType.Memory],
+	["device", TokenType.Device],
+	["register", TokenType.Register],
+	["instruction", TokenType.Instruction],
+	["fetch", TokenType.Fetch],
+	["decode", TokenType.Decode],
+	["execute", TokenType.Execute],
+	["halt", TokenType.Halt],
+]);
