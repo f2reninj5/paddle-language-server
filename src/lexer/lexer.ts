@@ -13,6 +13,14 @@ function isKeywordChar(char: string): boolean {
 	return /[a-z]/.test(char);
 }
 
+function isFirstIdentifierChar(char: string): boolean {
+	return /[a-z]_/.test(char);
+}
+
+function isIdentifierChar(char: string): boolean {
+	return /[a-z][0-9]_]/.test(char);
+}
+
 export function tokenise(source: string): Token[] {
 	const tokens: Token[] = [];
 	const cursor = new Cursor(source);
@@ -51,6 +59,27 @@ export function tokenise(source: string): Token[] {
 			if (keywords.has(value)) {
 				tokens.push({
 					type: keywords.get(value),
+					value,
+					line: startLine,
+					column: startColumn,
+				});
+			}
+
+			cursor.advance(length);
+			continue;
+		}
+
+		// identifiers
+		if (isFirstIdentifierChar(char)) {
+			const length = 1;
+
+			while (isIdentifierChar(cursor.peek(length))) length++;
+
+			const value = cursor.slice(length);
+
+			if (keywords.has(value)) {
+				tokens.push({
+					type: TokenType.Identifier,
 					value,
 					line: startLine,
 					column: startColumn,
