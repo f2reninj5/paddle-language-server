@@ -29,6 +29,16 @@ export class Cursor {
 		return this.source.slice(this.position, this.position + n);
 	}
 
+	peek(n: number): string | undefined {
+		const index = this.position + n;
+
+		if (index >= this.source.length) {
+			return undefined;
+		}
+
+		return this.source[index];
+	}
+
 	advance(): void {
 		this.position++;
 		this.column++;
