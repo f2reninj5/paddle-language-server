@@ -29,6 +29,10 @@ function isComponentIdentifierChar(char: string): boolean {
 	return /[A-Z][0-9]_]/.test(char);
 }
 
+function isNumber(char: string): boolean {
+	return /[0-9]/.test(char);
+}
+
 export function tokenise(source: string): Token[] {
 	const tokens: Token[] = [];
 	const cursor = new Cursor(source);
@@ -109,6 +113,27 @@ export function tokenise(source: string): Token[] {
 			if (keywords.has(value)) {
 				tokens.push({
 					type: TokenType.ComponentIdentifier,
+					value,
+					line: startLine,
+					column: startColumn,
+				});
+			}
+
+			cursor.advance(length);
+			continue;
+		}
+
+		// numbers
+		if (isNumber(char)) {
+			const length = 1;
+
+			while (isNumber(cursor.peek(length))) length++;
+
+			const value = cursor.slice(length);
+
+			if (keywords.has(value)) {
+				tokens.push({
+					type: TokenType.Number,
 					value,
 					line: startLine,
 					column: startColumn,
