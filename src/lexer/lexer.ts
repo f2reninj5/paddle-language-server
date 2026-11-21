@@ -166,10 +166,22 @@ export function tokenise(source: string): Token[] {
 			const value = cursor.slice(length);
 
 			tokens.push({
+				type: TokenType.StringStart,
+				'"',
+				line: startLine,
+				column: startColumn,
+			});
+			tokens.push({
 				type: TokenType.String,
 				value,
 				line: startLine,
-				column: startColumn,
+				column: startColumn + 1,
+			});
+			tokens.push({
+				type: TokenType.StringEnding,
+				'"',
+				line: startLine,
+				column: startColumn + length + 1,
 			});
 
 			cursor.advance(length + 1);
