@@ -33,6 +33,10 @@ function isNumber(char: string): boolean {
 	return /[0-9]/.test(char);
 }
 
+function isInvalidStringChar(char: string): boolean {
+	return ["\r", "\n"].includes(char);
+}
+
 export function tokenise(source: string): Token[] {
 	const tokens: Token[] = [];
 	const cursor = new Cursor(source);
@@ -141,6 +145,34 @@ export function tokenise(source: string): Token[] {
 			}
 
 			cursor.advance(length);
+			continue;
+		}
+
+		// strings
+		if (char === '"') {
+			cursor.advance();
+			const length = 0;
+
+			while ((nextChar = cursor.peek(length + 1)) !== '"') {
+				if (isInvalidStringChar(nextChar) {
+					throw new Error("Unexpected string character");
+				}
+				if (nextChar === undefined) {
+					throw new Error("Unterminated string");
+				}
+				length++;
+			}
+
+			const value = cursor.slice(length);
+
+			tokens.push({
+				type: TokenType.String,
+				value,
+				line: startLine,
+				column: startColumn,
+			});
+
+			cursor.advance(length + 1);
 			continue;
 		}
 
