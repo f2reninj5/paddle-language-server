@@ -21,10 +21,11 @@ export enum TokenType {
 	Write = "Write",
 	EqualEqual = "EqualEqual",
 	NotEqual = "NotEqual",
-	LessThan = "LessThan",
-	GreaterThan = "GreaterThan",
 	LessThanOrEqual = "LessThanOrEqual",
 	GreaterThanOrEqual = "GreaterThanOrEqual",
+
+	LessThan = "LessThan",
+	GreaterThan = "GreaterThan",
 	Plus = "Plus",
 	Minus = "Minus",
 	Multiply = "Multiply",
@@ -65,3 +66,22 @@ export const keywords = new Map<string, TokenType>([
 	["execute", TokenType.Execute],
 	["halt", TokenType.Halt],
 ]);
+
+export const operators = new Map<string, TokenType>([
+	["<-", TokenType.Write],
+	["==", TokenType.EqualEqual],
+	["!=", TokenType.NotEqual],
+	["<=", TokenType.LessThanOrEqual],
+	[">=", TokenType.GreaterThanOrEqual],
+	["<", TokenType.LessThan],
+	[">", TokenType.GreaterThan],
+	["+", TokenType.Plus],
+	["-", TokenType.Minus],
+	["*", TokenType.Multiply],
+	["/", TokenType.Divide],
+	["%", TokenType.Modulo],
+]);
+
+export const maxOperatorLength = Math.max(
+	...[...operators.keys()].map((o) => o.length),
+);
