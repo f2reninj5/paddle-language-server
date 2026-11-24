@@ -61,20 +61,28 @@ export function tokenise(source: string): Token[] {
 			continue;
 		}
 
-		const startLine = line;
-		const startColumn = column;
+		const startLine = cursor.line;
+		const startColumn = cursor.column;
 
 		// keywords
 		if (isKeywordChar(char)) {
-			const length = 1;
+			let length = 1;
 
-			while (isKeywordChar(cursor.peek(length))) length++;
+			while (true) {
+				const nextChar = cursor.peek(length);
+				if (nextChar === undefined) {
+					throw new Error("Unexpected end of file");
+				}
+				if (!isKeywordChar(nextChar)) break;
+				length++;
+			}
 
 			const value = cursor.slice(length);
 
-			if (keywords.has(value)) {
+			const type = keywords.get(value);
+			if (type !== undefined) {
 				tokens.push({
-					type: keywords.get(value),
+					type,
 					value,
 					line: startLine,
 					column: startColumn,
@@ -87,9 +95,16 @@ export function tokenise(source: string): Token[] {
 
 		// identifiers
 		if (isFirstIdentifierChar(char)) {
-			const length = 1;
+			let length = 1;
 
-			while (isIdentifierChar(cursor.peek(length))) length++;
+			while (true) {
+				const nextChar = cursor.peek(length);
+				if (nextChar === undefined) {
+					throw new Error("Unexpected end of file");
+				}
+				if (!isIdentifierChar(nextChar)) break;
+				length++;
+			}
 
 			const value = cursor.slice(length);
 
@@ -107,10 +122,17 @@ export function tokenise(source: string): Token[] {
 		}
 
 		// component identifiers
-		if (isFirstIdentifierChar(char)) {
-			const length = 1;
+		if (isFirstComponentIdentifierChar(char)) {
+			let length = 1;
 
-			while (isIdentifierChar(cursor.peek(length))) length++;
+			while (true) {
+				const nextChar = cursor.peek(length);
+				if (nextChar === undefined) {
+					throw new Error("Unexpected end of file");
+				}
+				if (!isComponentIdentifierChar(nextChar)) break;
+				length++;
+			}
 
 			const value = cursor.slice(length);
 
@@ -129,9 +151,16 @@ export function tokenise(source: string): Token[] {
 
 		// numbers
 		if (isNumber(char)) {
-			const length = 1;
+			let length = 1;
 
-			while (isNumber(cursor.peek(length))) length++;
+			while (true) {
+				const nextChar = cursor.peek(length);
+				if (nextChar === undefined) {
+					throw new Error("Unexpected end of file");
+				}
+				if (!isNumber(nextChar)) break;
+				length++;
+			}
 
 			const value = cursor.slice(length);
 
@@ -151,23 +180,25 @@ export function tokenise(source: string): Token[] {
 		// strings
 		if (char === '"') {
 			cursor.advance();
-			const length = 0;
+			let length = 0;
 
-			while ((nextChar = cursor.peek(length + 1)) !== '"') {
-				if (isInvalidStringChar(nextChar) {
-					throw new Error("Unexpected string character");
-				}
+			let nextChar = cursor.peek(length + 1);
+			while (nextChar !== '"') {
 				if (nextChar === undefined) {
 					throw new Error("Unterminated string");
 				}
+				if (isInvalidStringChar(nextChar)) {
+					throw new Error("Unexpected string character");
+				}
 				length++;
+				nextChar = cursor.peek(length + 1);
 			}
 
 			const value = cursor.slice(length);
 
 			tokens.push({
 				type: TokenType.StringStart,
-				'"',
+				value: '"',
 				line: startLine,
 				column: startColumn,
 			});
@@ -178,15 +209,15 @@ export function tokenise(source: string): Token[] {
 				column: startColumn + 1,
 			});
 			tokens.push({
-				type: TokenType.StringEnding,
-				'"',
+				type: TokenType.StringEnd,
+				value: '"',
 				line: startLine,
 				column: startColumn + length + 1,
 			});
 
 			cursor.advance(length + 1);
-			continue;
 		}
+	}
 
 	return tokens;
 }
