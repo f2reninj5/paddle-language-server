@@ -150,14 +150,14 @@ The developer manages dependency installation.
 
 The project uses pnpm, pinned to `11.24.0`.
 
-| Command | Purpose |
-|---|---|
-| `pnpm dev` | Run the server using tsx |
-| `pnpm build` | Compile TypeScript |
-| `pnpm test -- --run` | Run tests once |
-| `pnpm lint` | Run Biome linting |
-| `pnpm check` | Run Biome checks |
-| `pnpm check:fix` | Automatically fix Biome issues |
+| Command              | Purpose                        |
+| -------------------- | ------------------------------ |
+| `pnpm dev`           | Run the server using tsx       |
+| `pnpm build`         | Compile TypeScript             |
+| `pnpm test -- --run` | Run tests once                 |
+| `pnpm lint`          | Run Biome linting              |
+| `pnpm check`         | Run Biome checks               |
+| `pnpm check:fix`     | Automatically fix Biome issues |
 
 ### Validation
 
@@ -214,31 +214,16 @@ If something is ambiguous, make the smallest reasonable assumption and explain i
 
 ---
 
-## Git and commits
+## Git
 
-Small, incremental commits are mandatory.
-
-- Always work on the current branch.
-- Never create a branch unless explicitly requested.
-- Commit each meaningful change separately.
-- Prefer one file per commit.
+- Work on the current branch.
+- Do not create or switch branches unless explicitly requested.
+- Do not create commits.
 - Do not amend commits, rebase or rewrite history.
-- Never overwrite, discard or commit unrelated existing work.
+- Do not discard, reset or overwrite existing changes.
+- Preserve unrelated uncommitted work.
 
-Commit tests before their implementation only when the developer has explicitly requested tests.
-
-Use short, imperative, present-tense commit messages.
-
-Examples:
-
-- `Add remaining string token pushes`
-- `Write tokeniser code for numbers`
-- `Create operator map`
-- `Improve parser error messages`
-
-Check `git status` before committing. The development environment configures the commit author identity.
-
-Never commit generated build output.
+Leave all changes uncommitted for the developer to review.
 
 ---
 
@@ -249,6 +234,5 @@ Keep the final response brief. State:
 1. What was changed.
 2. Any assumptions or decisions made.
 3. Checks performed and any failures.
-4. The commit created.
 
 Be explicit about decisions made without developer direction. Never claim a check passed unless it was actually run.
