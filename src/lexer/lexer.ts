@@ -95,7 +95,7 @@ export function tokenise(source: string): Token[] {
 
 	function tokeniseNumber(): boolean {
 		if (!isNumber(cursor.current)) return false;
-		const value = cursor.sliceWhile(isKeywordChar);
+		const value = cursor.sliceWhile(isNumber);
 
 		pushToken(TokenType.Number, value);
 
