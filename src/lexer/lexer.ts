@@ -88,6 +88,21 @@ export function tokenise(source: string): Token[] {
 		return true;
 	}
 
+	function tokeniseNumber(): boolean {
+		if (!isNumber(cursor.current)) return false;
+		const value = cursor.sliceWhile(isKeywordChar);
+
+		tokens.push({
+			type: TokenType.Number,
+			value,
+			line: cursor.line,
+			column: cursor.column,
+		});
+
+		cursor.advance(length);
+		return true;
+	}
+
 	while (!cursor.isAtEnd) {
 		// whitespace
 		if (isWhitespace(cursor.current)) {
@@ -109,21 +124,7 @@ export function tokenise(source: string): Token[] {
 		if (tokeniseKeyword()) continue;
 		if (tokeniseIdentifier()) continue;
 		if (tokeniseComponentIdentifier()) continue;
-
-		// numbers
-		if (isNumber(cursor.current)) {
-			const value = cursor.sliceWhile(isKeywordChar);
-
-			tokens.push({
-				type: TokenType.Number,
-				value,
-				line: cursor.line,
-				column: cursor.column,
-			});
-
-			cursor.advance(length);
-			continue;
-		}
+		if (tokeniseNumber()) continue;
 
 		// strings
 		if (cursor.current === '"') {
