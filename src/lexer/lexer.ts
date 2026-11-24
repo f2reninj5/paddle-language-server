@@ -124,6 +124,16 @@ export function tokenise(source: string): Token[] {
 		return true;
 	}
 
+	function tokeniseStringContents(): boolean {
+		if (!isStringChar(cursor.current)) return false;
+		const value = cursor.sliceWhile(isStringChar);
+
+		pushToken(TokenType.String, value);
+
+		cursor.advance(value.length);
+		return true;
+	}
+
 	while (!cursor.isAtEnd) {
 		// whitespace
 		if (isWhitespace(cursor.current)) {
@@ -149,15 +159,7 @@ export function tokenise(source: string): Token[] {
 			cursor.advance();
 
 			while (cursor.current !== '"') {
-				if (isStringChar(cursor.current)) {
-					const value = cursor.sliceWhile(isStringChar);
-
-					pushToken(TokenType.String, value);
-
-					cursor.advance(value.length);
-					continue;
-				}
-
+				if (tokeniseStringContents()) continue;
 				if (tokeniseStringArgument()) continue;
 
 				throw new Error("Unexpected character in string");
