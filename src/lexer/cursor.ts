@@ -30,8 +30,9 @@ export class Cursor {
 	}
 
 	sliceWhile(predicate: (char: string) => boolean): string {
+		let length = 0;
+
 		while (true) {
-			let length = 0;
 			const nextChar = this.peek(length);
 			if (nextChar === undefined || !predicate(nextChar)) {
 				break;
