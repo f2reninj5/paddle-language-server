@@ -163,19 +163,7 @@ export function tokenise(source: string): Token[] {
 					cursor.advance();
 
 					while (cursor.current !== "}") {
-						if (isFirstIdentifierChar(cursor.current)) {
-							const value = cursor.sliceWhile(isIdentifierChar);
-
-							tokens.push({
-								type: TokenType.Identifier,
-								value,
-								line: cursor.line,
-								column: cursor.column,
-							});
-
-							cursor.advance(value.length);
-							continue;
-						}
+						if (tokeniseIdentifier()) continue;
 
 						if (cursor.current === ":") {
 							tokens.push({
