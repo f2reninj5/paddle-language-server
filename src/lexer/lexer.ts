@@ -206,5 +206,6 @@ export function tokenise(source: string): Token[] {
 		throw new Error("Unexpected character");
 	}
 
+	pushToken(TokenType.EOF, "");
 	return tokens;
 }
