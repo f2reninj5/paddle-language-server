@@ -20,11 +20,11 @@ function isKeywordChar(char: string): boolean {
 }
 
 function isFirstIdentifierChar(char: string): boolean {
-	return /[a-z]_/.test(char);
+	return /[a-z_]/.test(char);
 }
 
 function isIdentifierChar(char: string): boolean {
-	return /[a-z][0-9]_]/.test(char);
+	return /[a-z0-9_]/.test(char);
 }
 
 function isFirstComponentIdentifierChar(char: string): boolean {
@@ -32,7 +32,7 @@ function isFirstComponentIdentifierChar(char: string): boolean {
 }
 
 function isComponentIdentifierChar(char: string): boolean {
-	return /[A-Z][0-9]_]/.test(char);
+	return /[A-Z0-9_]/.test(char);
 }
 
 function isNumber(char: string): boolean {
