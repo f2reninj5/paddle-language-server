@@ -134,6 +134,25 @@ export function tokenise(source: string): Token[] {
 		return true;
 	}
 
+	function tokeniseString(): boolean {
+		if (cursor.current !== '"') return false;
+		pushToken(TokenType.StringStart, '"');
+
+		cursor.advance();
+
+		while (cursor.current !== '"') {
+			if (tokeniseStringContents()) continue;
+			if (tokeniseStringArgument()) continue;
+
+			throw new Error("Unexpected character in string");
+		}
+
+		pushToken(TokenType.StringEnd, '"');
+
+		cursor.advance();
+		return true;
+	}
+
 	while (!cursor.isAtEnd) {
 		// whitespace
 		if (isWhitespace(cursor.current)) {
@@ -152,24 +171,7 @@ export function tokenise(source: string): Token[] {
 		if (tokeniseIdentifier()) continue;
 		if (tokeniseComponentIdentifier()) continue;
 		if (tokeniseNumber()) continue;
-
-		// strings
-		if (cursor.current === '"') {
-			pushToken(TokenType.StringStart, '"');
-			cursor.advance();
-
-			while (cursor.current !== '"') {
-				if (tokeniseStringContents()) continue;
-				if (tokeniseStringArgument()) continue;
-
-				throw new Error("Unexpected character in string");
-			}
-
-			pushToken(TokenType.StringEnd, '"');
-
-			cursor.advance();
-			continue;
-		}
+		if (tokeniseString()) continue;
 
 		throw new Error("Unexpected character");
 	}
