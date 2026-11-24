@@ -62,6 +62,21 @@ export function tokenise(source: string): Token[] {
 		return false;
 	}
 
+	function tokeniseIdentifier(): boolean {
+		if (!isFirstIdentifierChar(cursor.current)) return false;
+		const value = cursor.sliceWhile(isIdentifierChar);
+
+		tokens.push({
+			type: TokenType.Identifier,
+			value,
+			line: cursor.line,
+			column: cursor.column,
+		});
+
+		cursor.advance(value.length);
+		return true;
+	}
+
 	while (!cursor.isAtEnd) {
 		// whitespace
 		if (isWhitespace(cursor.current)) {
@@ -81,21 +96,7 @@ export function tokenise(source: string): Token[] {
 		}
 
 		if (tokeniseKeyword()) continue;
-
-		// identifiers
-		if (isFirstIdentifierChar(cursor.current)) {
-			const value = cursor.sliceWhile(isIdentifierChar);
-
-			tokens.push({
-				type: TokenType.Identifier,
-				value,
-				line: cursor.line,
-				column: cursor.column,
-			});
-
-			cursor.advance(value.length);
-			continue;
-		}
+		if (tokeniseIdentifier()) continue;
 
 		// component identifiers
 		if (isFirstComponentIdentifierChar(cursor.current)) {
