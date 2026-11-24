@@ -221,6 +221,7 @@ export function tokenise(source: string): Token[] {
 		if (tokeniseComponentIdentifier()) continue;
 		if (tokeniseNumber()) continue;
 		if (tokeniseOperator()) continue;
+		if (tokeniseColon()) continue;
 		if (tokeniseIndex()) continue;
 		if (tokeniseString()) continue;
 
