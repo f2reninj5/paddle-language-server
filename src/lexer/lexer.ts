@@ -61,12 +61,7 @@ export function tokenise(source: string): Token[] {
 		const type = keywords.get(value);
 		if (type === undefined) return false;
 
-		tokens.push({
-			type,
-			value,
-			line: cursor.line,
-			column: cursor.column,
-		});
+		pushToken(type, value);
 
 		cursor.advance(value.length);
 		return true;
@@ -76,12 +71,7 @@ export function tokenise(source: string): Token[] {
 		if (!isFirstIdentifierChar(cursor.current)) return false;
 		const value = cursor.sliceWhile(isIdentifierChar);
 
-		tokens.push({
-			type: TokenType.Identifier,
-			value,
-			line: cursor.line,
-			column: cursor.column,
-		});
+		pushToken(TokenType.Identifier, value);
 
 		cursor.advance(value.length);
 		return true;
@@ -91,12 +81,7 @@ export function tokenise(source: string): Token[] {
 		if (!isFirstComponentIdentifierChar(cursor.current)) return false;
 		const value = cursor.sliceWhile(isComponentIdentifierChar);
 
-		tokens.push({
-			type: TokenType.ComponentIdentifier,
-			value,
-			line: cursor.line,
-			column: cursor.column,
-		});
+		pushToken(TokenType.ComponentIdentifier, value);
 
 		cursor.advance(value.length);
 		return true;
@@ -106,12 +91,7 @@ export function tokenise(source: string): Token[] {
 		if (!isNumber(cursor.current)) return false;
 		const value = cursor.sliceWhile(isKeywordChar);
 
-		tokens.push({
-			type: TokenType.Number,
-			value,
-			line: cursor.line,
-			column: cursor.column,
-		});
+		pushToken(TokenType.Number, value);
 
 		cursor.advance(length);
 		return true;
@@ -119,12 +99,7 @@ export function tokenise(source: string): Token[] {
 
 	function tokeniseColon(): boolean {
 		if (cursor.current !== ":") return false;
-		tokens.push({
-			type: TokenType.Colon,
-			value: ":",
-			line: cursor.line,
-			column: cursor.column,
-		});
+		pushToken(TokenType.Colon, ":");
 
 		cursor.advance();
 		return true;
@@ -134,11 +109,7 @@ export function tokenise(source: string): Token[] {
 		// whitespace
 		if (isWhitespace(cursor.current)) {
 			if (isNewLine(cursor.current)) {
-				tokens.push({
-					type: TokenType.NewLine,
-					value: "\n",
-					...cursor.getLocation(),
-				});
+				pushToken(TokenType.NewLine, "\n");
 
 				cursor.advanceLine();
 			} else {
@@ -155,12 +126,7 @@ export function tokenise(source: string): Token[] {
 
 		// strings
 		if (cursor.current === '"') {
-			tokens.push({
-				type: TokenType.StringStart,
-				value: '"',
-				line: cursor.line,
-				column: cursor.column,
-			});
+			pushToken(TokenType.StringStart, '"');
 
 			cursor.advance();
 
@@ -168,24 +134,14 @@ export function tokenise(source: string): Token[] {
 				if (isStringChar(cursor.current)) {
 					const value = cursor.sliceWhile(isStringChar);
 
-					tokens.push({
-						type: TokenType.String,
-						value,
-						line: cursor.line,
-						column: cursor.column,
-					});
+					pushToken(TokenType.String, value);
 
 					cursor.advance(value.length);
 					continue;
 				}
 
 				if (cursor.current === "{") {
-					tokens.push({
-						type: TokenType.ArgumentStart,
-						value: "{",
-						line: cursor.line,
-						column: cursor.column,
-					});
+					pushToken(TokenType.ArgumentStart, "{");
 
 					cursor.advance();
 
@@ -195,12 +151,7 @@ export function tokenise(source: string): Token[] {
 						throw new Error("Unexpected character in argument");
 					}
 
-					tokens.push({
-						type: TokenType.ArgumentEnd,
-						value: "}",
-						line: cursor.line,
-						column: cursor.column,
-					});
+					pushToken(TokenType.ArgumentEnd, "}");
 
 					cursor.advance();
 					continue;
@@ -209,12 +160,7 @@ export function tokenise(source: string): Token[] {
 				throw new Error("Unexpected character in string");
 			}
 
-			tokens.push({
-				type: TokenType.StringEnd,
-				value: '"',
-				line: cursor.line,
-				column: cursor.column,
-			});
+			pushToken(TokenType.StringEnd, '"');
 
 			cursor.advance();
 			continue;
