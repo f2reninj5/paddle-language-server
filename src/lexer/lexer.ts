@@ -99,7 +99,7 @@ export function tokenise(source: string): Token[] {
 
 		pushToken(TokenType.Number, value);
 
-		cursor.advance(length);
+		cursor.advance(value.length);
 		return true;
 	}
 
