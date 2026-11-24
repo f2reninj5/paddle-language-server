@@ -41,6 +41,21 @@ export function tokenise(source: string): Token[] {
 	const tokens: Token[] = [];
 	const cursor = new Cursor(source);
 
+	function consumeWhile(predicate: (char: string) => boolean): string {
+		while (true) {
+			let length = 0;
+			const nextChar = cursor.peek(length);
+			if (nextChar === undefined || !predicate(nextChar)) {
+				break;
+			}
+			length++;
+		}
+
+		const value = cursor.slice(length);
+		cursor.advance(length);
+		return value;
+	}
+
 	while (!cursor.isAtEnd) {
 		const char = cursor.current;
 
