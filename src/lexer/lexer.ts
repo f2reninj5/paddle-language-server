@@ -33,8 +33,8 @@ function isNumber(char: string): boolean {
 	return /[0-9]/.test(char);
 }
 
-function isInvalidStringChar(char: string): boolean {
-	return ["\r", "\n"].includes(char);
+function isStringChar(char: string): boolean {
+	return !["\r", "\n", '"', "{", "}"].includes(char);
 }
 
 export function tokenise(source: string): Token[] {
@@ -126,45 +126,97 @@ export function tokenise(source: string): Token[] {
 		}
 
 		// strings
-		if (char === '"') {
+		if (cursor.current === '"') {
 			tokens.push({
 				type: TokenType.StringStart,
 				value: '"',
 				line: cursor.line,
 				column: cursor.column,
 			});
-			cursor.advance();
-			let length = 0;
 
-			let nextChar = cursor.peek(length + 1);
-			while (nextChar !== '"') {
-				if (nextChar === undefined) {
-					throw new Error("Unterminated string");
+			cursor.advance();
+
+			while (cursor.current !== '"') {
+				if (isStringChar(cursor.current)) {
+					const value = cursor.sliceWhile(isStringChar);
+
+					tokens.push({
+						type: TokenType.String,
+						value,
+						line: cursor.line,
+						column: cursor.column,
+					});
+
+					cursor.advance(value.length);
+					continue;
 				}
-				if (isInvalidStringChar(nextChar)) {
-					throw new Error("Unexpected string character");
+
+				if (cursor.current === "{") {
+					tokens.push({
+						type: TokenType.ArgumentStart,
+						value: "{",
+						line: cursor.line,
+						column: cursor.column,
+					});
+
+					cursor.advance();
+
+					while (cursor.current !== "}") {
+						if (isFirstIdentifierChar(cursor.current)) {
+							const value = cursor.sliceWhile(isIdentifierChar);
+
+							tokens.push({
+								type: TokenType.Identifier,
+								value,
+								line: cursor.line,
+								column: cursor.column,
+							});
+
+							cursor.advance(value.length);
+							continue;
+						}
+
+						if (cursor.current === ":") {
+							tokens.push({
+								type: TokenType.Colon,
+								value: ":",
+								line: cursor.line,
+								column: cursor.column,
+							});
+
+							cursor.advance();
+							continue;
+						}
+
+						throw new Error("Unexpected character in argument");
+					}
+
+					tokens.push({
+						type: TokenType.ArgumentEnd,
+						value: "}",
+						line: cursor.line,
+						column: cursor.column,
+					});
+
+					cursor.advance();
+					continue;
 				}
-				length++;
-				nextChar = cursor.peek(length + 1);
+
+				throw new Error("Unexpected character in string");
 			}
 
-			const value = cursor.slice(length);
-
-			tokens.push({
-				type: TokenType.String,
-				value,
-				line: cursor.line,
-				column: cursor.column + 1,
-			});
 			tokens.push({
 				type: TokenType.StringEnd,
 				value: '"',
 				line: cursor.line,
-				column: cursor.column + length + 1,
+				column: cursor.column,
 			});
 
-			cursor.advance(length + 1);
+			cursor.advance();
+			continue;
 		}
+
+		throw new Error("Unexpected character");
 	}
 
 	return tokens;

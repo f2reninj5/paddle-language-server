@@ -42,6 +42,7 @@ export enum TokenType {
 	IndexEnd = "IndexEnd",
 	ArgumentStart = "ArgumentStart",
 	ArgumentEnd = "ArgumentEnd",
+	Colon = "Colon",
 
 	// special
 	EOF = "EOF",
