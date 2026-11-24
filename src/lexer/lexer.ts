@@ -153,6 +153,26 @@ export function tokenise(source: string): Token[] {
 		return true;
 	}
 
+	function tokeniseIndex(): boolean {
+		if (cursor.current !== "[") return false;
+		pushToken(TokenType.IndexStart, "[");
+
+		cursor.advance();
+
+		// @ts-expect-error cursor.current updates with cursor.advance()
+		while (cursor.current !== "]") {
+			if (tokeniseIdentifier()) continue;
+			if (tokeniseComponentIdentifier()) continue;
+			if (tokeniseNumber()) continue;
+			throw new Error("Unexpected character in index");
+		}
+
+		pushToken(TokenType.IndexEnd, "]");
+
+		cursor.advance();
+		return true;
+	}
+
 	function tokeniseStringContents(): boolean {
 		if (!isStringChar(cursor.current)) return false;
 		const value = cursor.sliceWhile(isStringChar);
@@ -201,6 +221,7 @@ export function tokenise(source: string): Token[] {
 		if (tokeniseComponentIdentifier()) continue;
 		if (tokeniseNumber()) continue;
 		if (tokeniseOperator()) continue;
+		if (tokeniseIndex()) continue;
 		if (tokeniseString()) continue;
 
 		throw new Error("Unexpected character");
