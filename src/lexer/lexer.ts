@@ -1,5 +1,11 @@
 import { Cursor } from "./cursor.js";
-import { keywords, type Token, TokenType } from "./token.js";
+import {
+	keywords,
+	maxOperatorLength,
+	operators,
+	type Token,
+	TokenType,
+} from "./token.js";
 
 function isWhitespace(char: string): boolean {
 	return /\s/.test(char);
@@ -97,6 +103,27 @@ export function tokenise(source: string): Token[] {
 		return true;
 	}
 
+	function tokeniseOperator(): boolean {
+		let length = 0;
+		while (length < maxOperatorLength && cursor.peek(length) !== undefined) {
+			length++;
+		}
+		const value = cursor.slice(length);
+
+		while (length > 0) {
+			const operator = value.slice(0, length);
+			const type = operators.get(operator);
+			if (type !== undefined) {
+				pushToken(type, operator);
+				cursor.advance(operator.length);
+				return true;
+			}
+			length--;
+		}
+
+		return false;
+	}
+
 	function tokeniseColon(): boolean {
 		if (cursor.current !== ":") return false;
 		pushToken(TokenType.Colon, ":");
@@ -171,6 +198,7 @@ export function tokenise(source: string): Token[] {
 		if (tokeniseIdentifier()) continue;
 		if (tokeniseComponentIdentifier()) continue;
 		if (tokeniseNumber()) continue;
+		if (tokeniseOperator()) continue;
 		if (tokeniseString()) continue;
 
 		throw new Error("Unexpected character");
