@@ -79,20 +79,9 @@ export function tokenise(source: string): Token[] {
 
 		// keywords
 		if (isKeywordChar(char)) {
-			let length = 1;
-
-			while (true) {
-				const nextChar = cursor.peek(length);
-				if (nextChar === undefined) {
-					throw new Error("Unexpected end of file");
-				}
-				if (!isKeywordChar(nextChar)) break;
-				length++;
-			}
-
-			const value = cursor.slice(length);
-
+			const value = sliceWhile(isKeywordChar);
 			const type = keywords.get(value);
+
 			if (type !== undefined) {
 				tokens.push({
 					type,
@@ -100,9 +89,10 @@ export function tokenise(source: string): Token[] {
 					line: startLine,
 					column: startColumn,
 				});
+
+				cursor.advance(value.length);
 			}
 
-			cursor.advance(length);
 			continue;
 		}
 
