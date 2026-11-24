@@ -41,6 +41,27 @@ export function tokenise(source: string): Token[] {
 	const tokens: Token[] = [];
 	const cursor = new Cursor(source);
 
+	function tokeniseKeyword(): boolean {
+		if (isKeywordChar(cursor.current)) {
+			const value = cursor.sliceWhile(isKeywordChar);
+			const type = keywords.get(value);
+
+			if (type !== undefined) {
+				tokens.push({
+					type,
+					value,
+					line: cursor.line,
+					column: cursor.column,
+				});
+
+				cursor.advance(value.length);
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	while (!cursor.isAtEnd) {
 		// whitespace
 		if (isWhitespace(cursor.current)) {
@@ -59,24 +80,7 @@ export function tokenise(source: string): Token[] {
 			continue;
 		}
 
-		// keywords
-		if (isKeywordChar(cursor.current)) {
-			const value = cursor.sliceWhile(isKeywordChar);
-			const type = keywords.get(value);
-
-			if (type !== undefined) {
-				tokens.push({
-					type,
-					value,
-					line: cursor.line,
-					column: cursor.column,
-				});
-
-				cursor.advance(value.length);
-			}
-
-			continue;
-		}
+		if (tokeniseKeyword()) continue;
 
 		// identifiers
 		if (isFirstIdentifierChar(cursor.current)) {
