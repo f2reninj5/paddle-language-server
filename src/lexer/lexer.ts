@@ -42,24 +42,20 @@ export function tokenise(source: string): Token[] {
 	const cursor = new Cursor(source);
 
 	function tokeniseKeyword(): boolean {
-		if (isKeywordChar(cursor.current)) {
-			const value = cursor.sliceWhile(isKeywordChar);
-			const type = keywords.get(value);
+		if (!isKeywordChar(cursor.current)) return false;
+		const value = cursor.sliceWhile(isKeywordChar);
+		const type = keywords.get(value);
+		if (type === undefined) return false;
 
-			if (type !== undefined) {
-				tokens.push({
-					type,
-					value,
-					line: cursor.line,
-					column: cursor.column,
-				});
+		tokens.push({
+			type,
+			value,
+			line: cursor.line,
+			column: cursor.column,
+		});
 
-				cursor.advance(value.length);
-				return true;
-			}
-		}
-
-		return false;
+		cursor.advance(value.length);
+		return true;
 	}
 
 	function tokeniseIdentifier(): boolean {
