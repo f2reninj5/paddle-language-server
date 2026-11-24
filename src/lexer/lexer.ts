@@ -41,6 +41,20 @@ export function tokenise(source: string): Token[] {
 	const tokens: Token[] = [];
 	const cursor = new Cursor(source);
 
+	function pushToken(
+		type: TokenType,
+		value: string,
+		line: number | undefined = undefined,
+		column: number | undefined = undefined,
+	) {
+		tokens.push({
+			type,
+			value,
+			line: line ?? cursor.line,
+			column: column ?? cursor.column,
+		});
+	}
+
 	function tokeniseKeyword(): boolean {
 		if (!isKeywordChar(cursor.current)) return false;
 		const value = cursor.sliceWhile(isKeywordChar);
