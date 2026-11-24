@@ -29,6 +29,19 @@ export class Cursor {
 		return this.source.slice(this.position, this.position + n);
 	}
 
+	sliceWhile(predicate: (char: string) => boolean): string {
+		while (true) {
+			let length = 0;
+			const nextChar = this.peek(length);
+			if (nextChar === undefined || !predicate(nextChar)) {
+				break;
+			}
+			length++;
+		}
+
+		return this.slice(length);
+	}
+
 	peek(n: number): string | undefined {
 		const index = this.position + n;
 

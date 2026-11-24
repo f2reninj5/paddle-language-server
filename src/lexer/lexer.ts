@@ -41,19 +41,6 @@ export function tokenise(source: string): Token[] {
 	const tokens: Token[] = [];
 	const cursor = new Cursor(source);
 
-	function sliceWhile(predicate: (char: string) => boolean): string {
-		while (true) {
-			let length = 0;
-			const nextChar = cursor.peek(length);
-			if (nextChar === undefined || !predicate(nextChar)) {
-				break;
-			}
-			length++;
-		}
-
-		return cursor.slice(length);
-	}
-
 	while (!cursor.isAtEnd) {
 		const char = cursor.current;
 
@@ -79,7 +66,7 @@ export function tokenise(source: string): Token[] {
 
 		// keywords
 		if (isKeywordChar(char)) {
-			const value = sliceWhile(isKeywordChar);
+			const value = cursor.sliceWhile(isKeywordChar);
 			const type = keywords.get(value);
 
 			if (type !== undefined) {
