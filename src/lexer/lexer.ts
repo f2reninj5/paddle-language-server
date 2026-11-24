@@ -61,9 +61,6 @@ export function tokenise(source: string): Token[] {
 			continue;
 		}
 
-		const startLine = cursor.line;
-		const startColumn = cursor.column;
-
 		// keywords
 		if (isKeywordChar(char)) {
 			const value = cursor.sliceWhile(isKeywordChar);
@@ -73,8 +70,8 @@ export function tokenise(source: string): Token[] {
 				tokens.push({
 					type,
 					value,
-					line: startLine,
-					column: startColumn,
+					line: cursor.line,
+					column: cursor.column,
 				});
 
 				cursor.advance(value.length);
@@ -90,8 +87,8 @@ export function tokenise(source: string): Token[] {
 			tokens.push({
 				type: TokenType.Identifier,
 				value,
-				line: startLine,
-				column: startColumn,
+				line: cursor.line,
+				column: cursor.column,
 			});
 
 			cursor.advance(value.length);
@@ -105,8 +102,8 @@ export function tokenise(source: string): Token[] {
 			tokens.push({
 				type: TokenType.ComponentIdentifier,
 				value,
-				line: startLine,
-				column: startColumn,
+				line: cursor.line,
+				column: cursor.column,
 			});
 
 			cursor.advance(value.length);
@@ -120,8 +117,8 @@ export function tokenise(source: string): Token[] {
 			tokens.push({
 				type: TokenType.Number,
 				value,
-				line: startLine,
-				column: startColumn,
+				line: cursor.line,
+				column: cursor.column,
 			});
 
 			cursor.advance(length);
@@ -130,6 +127,12 @@ export function tokenise(source: string): Token[] {
 
 		// strings
 		if (char === '"') {
+			tokens.push({
+				type: TokenType.StringStart,
+				value: '"',
+				line: cursor.line,
+				column: cursor.column,
+			});
 			cursor.advance();
 			let length = 0;
 
@@ -148,22 +151,16 @@ export function tokenise(source: string): Token[] {
 			const value = cursor.slice(length);
 
 			tokens.push({
-				type: TokenType.StringStart,
-				value: '"',
-				line: startLine,
-				column: startColumn,
-			});
-			tokens.push({
 				type: TokenType.String,
 				value,
-				line: startLine,
-				column: startColumn + 1,
+				line: cursor.line,
+				column: cursor.column + 1,
 			});
 			tokens.push({
 				type: TokenType.StringEnd,
 				value: '"',
-				line: startLine,
-				column: startColumn + length + 1,
+				line: cursor.line,
+				column: cursor.column + length + 1,
 			});
 
 			cursor.advance(length + 1);
