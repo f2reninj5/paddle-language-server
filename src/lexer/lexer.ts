@@ -105,6 +105,25 @@ export function tokenise(source: string): Token[] {
 		return true;
 	}
 
+	function tokeniseStringArgument(): boolean {
+		if (cursor.current !== "{") return false;
+		pushToken(TokenType.ArgumentStart, "{");
+
+		cursor.advance();
+
+		// @ts-expect-error cursor.current updates with cursor.advance()
+		while (cursor.current !== "}") {
+			if (tokeniseIdentifier()) continue;
+			if (tokeniseColon()) continue;
+			throw new Error("Unexpected character in argument");
+		}
+
+		pushToken(TokenType.ArgumentEnd, "}");
+
+		cursor.advance();
+		return true;
+	}
+
 	while (!cursor.isAtEnd) {
 		// whitespace
 		if (isWhitespace(cursor.current)) {
@@ -127,7 +146,6 @@ export function tokenise(source: string): Token[] {
 		// strings
 		if (cursor.current === '"') {
 			pushToken(TokenType.StringStart, '"');
-
 			cursor.advance();
 
 			while (cursor.current !== '"') {
@@ -140,22 +158,7 @@ export function tokenise(source: string): Token[] {
 					continue;
 				}
 
-				if (cursor.current === "{") {
-					pushToken(TokenType.ArgumentStart, "{");
-
-					cursor.advance();
-
-					while (cursor.current !== "}") {
-						if (tokeniseIdentifier()) continue;
-						if (tokeniseColon()) continue;
-						throw new Error("Unexpected character in argument");
-					}
-
-					pushToken(TokenType.ArgumentEnd, "}");
-
-					cursor.advance();
-					continue;
-				}
+				if (tokeniseStringArgument()) continue;
 
 				throw new Error("Unexpected character in string");
 			}
