@@ -119,27 +119,14 @@ export function tokenise(source: string): Token[] {
 
 		// numbers
 		if (isNumber(char)) {
-			let length = 1;
+			const value = cursor.sliceWhile(isKeywordChar);
 
-			while (true) {
-				const nextChar = cursor.peek(length);
-				if (nextChar === undefined) {
-					throw new Error("Unexpected end of file");
-				}
-				if (!isNumber(nextChar)) break;
-				length++;
-			}
-
-			const value = cursor.slice(length);
-
-			if (keywords.has(value)) {
-				tokens.push({
-					type: TokenType.Number,
-					value,
-					line: startLine,
-					column: startColumn,
-				});
-			}
+			tokens.push({
+				type: TokenType.Number,
+				value,
+				line: startLine,
+				column: startColumn,
+			});
 
 			cursor.advance(length);
 			continue;
