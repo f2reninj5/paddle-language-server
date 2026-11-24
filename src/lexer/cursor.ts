@@ -1,7 +1,3 @@
-function isWindowsNewLine(chars: string): boolean {
-	return chars === "\r\n";
-}
-
 export class Cursor {
 	position: number = 0;
 	line: number = 1;
@@ -59,7 +55,7 @@ export class Cursor {
 	}
 
 	advanceLine(): void {
-		if (isWindowsNewLine(this.slice(2))) {
+		if (this.current === "\r" && this.peek(1) === "\n") {
 			this.position += 2;
 		} else {
 			this.position++;
