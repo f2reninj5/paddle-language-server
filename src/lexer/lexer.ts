@@ -142,6 +142,8 @@ export function tokenise(source: string): Token[] {
 		while (cursor.current !== "}") {
 			if (tokeniseIdentifier()) continue;
 			if (tokeniseColon()) continue;
+			if (tokeniseOperator()) continue;
+			if (tokeniseNumber()) continue;
 			throw new Error("Unexpected character in argument");
 		}
 
