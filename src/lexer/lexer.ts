@@ -103,6 +103,19 @@ export function tokenise(source: string): Token[] {
 		return true;
 	}
 
+	function tokeniseColon(): boolean {
+		if (cursor.current !== ":") return false;
+		tokens.push({
+			type: TokenType.Colon,
+			value: ":",
+			line: cursor.line,
+			column: cursor.column,
+		});
+
+		cursor.advance();
+		return true;
+	}
+
 	while (!cursor.isAtEnd) {
 		// whitespace
 		if (isWhitespace(cursor.current)) {
@@ -164,19 +177,7 @@ export function tokenise(source: string): Token[] {
 
 					while (cursor.current !== "}") {
 						if (tokeniseIdentifier()) continue;
-
-						if (cursor.current === ":") {
-							tokens.push({
-								type: TokenType.Colon,
-								value: ":",
-								line: cursor.line,
-								column: cursor.column,
-							});
-
-							cursor.advance();
-							continue;
-						}
-
+						if (tokeniseColon()) continue;
 						throw new Error("Unexpected character in argument");
 					}
 
