@@ -42,11 +42,9 @@ export function tokenise(source: string): Token[] {
 	const cursor = new Cursor(source);
 
 	while (!cursor.isAtEnd) {
-		const char = cursor.current;
-
 		// whitespace
-		if (isWhitespace(char)) {
-			if (isNewLine(char)) {
+		if (isWhitespace(cursor.current)) {
+			if (isNewLine(cursor.current)) {
 				tokens.push({
 					type: TokenType.NewLine,
 					value: "\n",
@@ -62,7 +60,7 @@ export function tokenise(source: string): Token[] {
 		}
 
 		// keywords
-		if (isKeywordChar(char)) {
+		if (isKeywordChar(cursor.current)) {
 			const value = cursor.sliceWhile(isKeywordChar);
 			const type = keywords.get(value);
 
@@ -81,7 +79,7 @@ export function tokenise(source: string): Token[] {
 		}
 
 		// identifiers
-		if (isFirstIdentifierChar(char)) {
+		if (isFirstIdentifierChar(cursor.current)) {
 			const value = cursor.sliceWhile(isIdentifierChar);
 
 			tokens.push({
@@ -96,7 +94,7 @@ export function tokenise(source: string): Token[] {
 		}
 
 		// component identifiers
-		if (isFirstComponentIdentifierChar(char)) {
+		if (isFirstComponentIdentifierChar(cursor.current)) {
 			const value = cursor.sliceWhile(isComponentIdentifierChar);
 
 			tokens.push({
@@ -111,7 +109,7 @@ export function tokenise(source: string): Token[] {
 		}
 
 		// numbers
-		if (isNumber(char)) {
+		if (isNumber(cursor.current)) {
 			const value = cursor.sliceWhile(isKeywordChar);
 
 			tokens.push({
