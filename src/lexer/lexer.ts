@@ -102,29 +102,18 @@ export function tokenise(source: string): Token[] {
 
 		// component identifiers
 		if (isFirstComponentIdentifierChar(char)) {
-			let length = 1;
+			let value = char;
+			cursor.advance();
+			value += cursor.sliceWhile(isComponentIdentifierChar);
 
-			while (true) {
-				const nextChar = cursor.peek(length);
-				if (nextChar === undefined) {
-					throw new Error("Unexpected end of file");
-				}
-				if (!isComponentIdentifierChar(nextChar)) break;
-				length++;
-			}
+			tokens.push({
+				type: TokenType.ComponentIdentifier,
+				value,
+				line: startLine,
+				column: startColumn,
+			});
 
-			const value = cursor.slice(length);
-
-			if (keywords.has(value)) {
-				tokens.push({
-					type: TokenType.ComponentIdentifier,
-					value,
-					line: startLine,
-					column: startColumn,
-				});
-			}
-
-			cursor.advance(length);
+			cursor.advance(value.length - 1);
 			continue;
 		}
 
