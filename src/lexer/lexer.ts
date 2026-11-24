@@ -85,9 +85,7 @@ export function tokenise(source: string): Token[] {
 
 		// identifiers
 		if (isFirstIdentifierChar(char)) {
-			let value = char;
-			cursor.advance();
-			value += cursor.sliceWhile(isIdentifierChar);
+			const value = cursor.sliceWhile(isIdentifierChar);
 
 			tokens.push({
 				type: TokenType.Identifier,
@@ -96,15 +94,13 @@ export function tokenise(source: string): Token[] {
 				column: startColumn,
 			});
 
-			cursor.advance(value.length - 1);
+			cursor.advance(value.length);
 			continue;
 		}
 
 		// component identifiers
 		if (isFirstComponentIdentifierChar(char)) {
-			let value = char;
-			cursor.advance();
-			value += cursor.sliceWhile(isComponentIdentifierChar);
+			const value = cursor.sliceWhile(isComponentIdentifierChar);
 
 			tokens.push({
 				type: TokenType.ComponentIdentifier,
@@ -113,7 +109,7 @@ export function tokenise(source: string): Token[] {
 				column: startColumn,
 			});
 
-			cursor.advance(value.length - 1);
+			cursor.advance(value.length);
 			continue;
 		}
 
