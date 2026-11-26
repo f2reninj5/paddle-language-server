@@ -1,51 +1,23 @@
 import { Cursor } from "./cursor.js";
 import {
+	isComponentIdentifierChar,
+	isFirstComponentIdentifierChar,
+	isFirstIdentifierChar,
+	isIdentifierChar,
+	isIndentationWhitespace,
+	isKeywordChar,
+	isNewLine,
+	isNumber,
+	isStringChar,
+	isWhitespace,
+} from "./predicates.js";
+import {
 	keywords,
 	maxOperatorLength,
 	operators,
 	type Token,
 	TokenType,
 } from "./token.js";
-
-function isWhitespace(char: string): boolean {
-	return /\s/.test(char);
-}
-
-function isIndentationWhitespace(char: string): boolean {
-	return char === " " || char === "\t";
-}
-
-function isNewLine(char: string): boolean {
-	return char === "\r" || char === "\n";
-}
-
-function isKeywordChar(char: string): boolean {
-	return /[a-z]/.test(char);
-}
-
-function isFirstIdentifierChar(char: string): boolean {
-	return /[a-z_]/.test(char);
-}
-
-function isIdentifierChar(char: string): boolean {
-	return /[a-z0-9_]/.test(char);
-}
-
-function isFirstComponentIdentifierChar(char: string): boolean {
-	return /[A-Z]/.test(char);
-}
-
-function isComponentIdentifierChar(char: string): boolean {
-	return /[A-Z0-9_]/.test(char);
-}
-
-function isNumber(char: string): boolean {
-	return /[0-9]/.test(char);
-}
-
-function isStringChar(char: string): boolean {
-	return !["\r", "\n", '"', "{", "}"].includes(char);
-}
 
 export function tokenise(source: string): Token[] {
 	const tokens: Token[] = [];
