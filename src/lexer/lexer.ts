@@ -11,6 +11,10 @@ function isWhitespace(char: string): boolean {
 	return /\s/.test(char);
 }
 
+function isIndentationWhitespace(char: string): boolean {
+	return char === " " || char === "\t";
+}
+
 function isNewLine(char: string): boolean {
 	return char === "\r" || char === "\n";
 }
@@ -46,6 +50,8 @@ function isStringChar(char: string): boolean {
 export function tokenise(source: string): Token[] {
 	const tokens: Token[] = [];
 	const cursor = new Cursor(source);
+	let currentDepth = 0;
+	let indentationUnit: string | undefined;
 
 	function pushToken(
 		type: TokenType,
@@ -59,6 +65,71 @@ export function tokenise(source: string): Token[] {
 			line: line ?? cursor.line,
 			column: column ?? cursor.column,
 		});
+	}
+
+	function matchesIndentationUnit(indentation: string): boolean {
+		if (indentationUnit === undefined)
+			throw Error("Indentation unit is undefined");
+
+		if (indentation.length % indentationUnit.length !== 0) return false;
+
+		for (let i = 0; i < indentation.length; i += indentationUnit.length) {
+			if (indentation.slice(i, i + indentationUnit.length) !== indentationUnit)
+				return false;
+		}
+
+		return true;
+	}
+
+	function getIndentationDepth(indentation: string): number {
+		if (indentation.length === 0) return 0;
+
+		if (indentationUnit === undefined) {
+			indentationUnit = indentation;
+		} else if (!matchesIndentationUnit(indentation)) {
+			throw new Error("Inconsistent indentation");
+		}
+
+		return indentation.length / indentationUnit.length;
+	}
+
+	function tokeniseIndent(): boolean {
+		const indentation = cursor.sliceWhile(isIndentationWhitespace);
+		cursor.advance(indentation.length);
+
+		if (cursor.isAtEnd || isNewLine(cursor.current)) {
+			return indentation.length > 0;
+		}
+		const indentationDepth = getIndentationDepth(indentation);
+
+		while (currentDepth > indentationDepth) {
+			pushToken(TokenType.Dedent, "");
+			currentDepth--;
+		}
+
+		while (currentDepth < indentationDepth) {
+			pushToken(TokenType.Indent, "");
+			currentDepth++;
+		}
+
+		return indentation.length > 0;
+	}
+
+	function consumeWhitespace({
+		onNewline,
+	}: {
+		onNewline: () => boolean;
+	}): boolean {
+		if (!isWhitespace(cursor.current)) return false;
+
+		if (isNewLine(cursor.current)) {
+			pushToken(TokenType.NewLine, "\n");
+			cursor.advanceLine();
+			return onNewline() || cursor.isAtEnd || isWhitespace(cursor.current);
+		} else {
+			cursor.advance();
+			return true;
+		}
 	}
 
 	function tokeniseKeyword(): boolean {
@@ -202,20 +273,10 @@ export function tokenise(source: string): Token[] {
 		return true;
 	}
 
+	tokeniseIndent();
+
 	while (!cursor.isAtEnd) {
-		// whitespace
-		if (isWhitespace(cursor.current)) {
-			if (isNewLine(cursor.current)) {
-				pushToken(TokenType.NewLine, "\n");
-
-				cursor.advanceLine();
-			} else {
-				cursor.advance();
-			}
-
-			continue;
-		}
-
+		if (consumeWhitespace({ onNewline: tokeniseIndent })) continue;
 		if (tokeniseKeyword()) continue;
 		if (tokeniseIdentifier()) continue;
 		if (tokeniseComponentIdentifier()) continue;
@@ -226,6 +287,11 @@ export function tokenise(source: string): Token[] {
 		if (tokeniseString()) continue;
 
 		throw new Error("Unexpected character");
+	}
+
+	while (currentDepth > 0) {
+		pushToken(TokenType.Dedent, "");
+		currentDepth--;
 	}
 
 	pushToken(TokenType.EOF, "");
